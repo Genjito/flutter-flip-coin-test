@@ -1,8 +1,32 @@
 import 'package:flip_card/flip_card.dart';
 import 'package:flip_card/flip_card_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-void main() => runApp(const AppWidget());
+void main() => runApp(
+      ChangeNotifierProvider(
+        create: (context) => Counter(),
+        child: const AppWidget(),
+      ),
+    );
+
+class Counter with ChangeNotifier {
+  int value = 0;
+  var fpc = FlipCardController();
+
+  void increment() {
+    print('increment');
+    value += 1;
+    print('Value is now: ${value}');
+
+    // if (value == 3) {
+    //   print('Value is 3 toogle card');
+    //   fpc.toggleCard();
+    // }
+
+    notifyListeners();
+  }
+}
 
 class AppWidget extends StatefulWidget {
   const AppWidget({Key? key}) : super(key: key);
@@ -22,6 +46,8 @@ class _AppWidgetState extends State<AppWidget> {
 
   @override
   Widget build(BuildContext context) {
+     var counter = context.read<Counter>();
+     
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Material App',
@@ -41,10 +67,19 @@ class _AppWidgetState extends State<AppWidget> {
                   image: AssetImage('assets/images/coin-front.png'),
                   width: 200,
                 ),
+                onFlip: () {
+                  print('Flipped');
+
+                  counter.increment();
+                },
               ),
               const SizedBox(
                 height: 20,
               ),
+              const Text('You have clicked...'),
+              Consumer<Counter>(
+                  builder: (context, counter, child) =>
+                      Text('Clicked: ${counter.value}'),),
               IconButton(
                 onPressed: () {
                   if (!_controller.state!.isFront) {
