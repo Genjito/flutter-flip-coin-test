@@ -24,11 +24,12 @@ class Counter with ChangeNotifier {
     notifyListeners();
   }
 
-  void checkToogledAmount() {
+  Future<void> checkToogledAmount() async {
     if (value == 3) {
       print('Value is 3 - toogle card');
+      await Future.delayed(const Duration(milliseconds: 1000));
       fpc.toggleCard(); // Use the FlipCardController instance to toggle the card
-    }
+    }  
   }
 }
 
@@ -43,6 +44,12 @@ class _AppWidgetState extends State<AppWidget> {
   @override
   Widget build(BuildContext context) {
     var counter = context.read<Counter>(); // Read the Counter instance
+    
+    if (counter.value == 3) {
+      
+      // await Future.delayed(const Duration(milliseconds: 1000));
+      // counter.flipCardController.toggleCard();
+    }
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -73,10 +80,10 @@ class _AppWidgetState extends State<AppWidget> {
                   //   counter.flipCardController.toggleCard();
                   // }
                 },
-                onFlipDone: (status) {
-                  print('status: ${status}');
-                  counter.checkToogledAmount();
-                },
+                // onFlipDone: (status) {
+                //   print('status: ${status}');
+                //   counter.checkToogledAmount();
+                // },
               ),
               const SizedBox(
                 height: 20,
