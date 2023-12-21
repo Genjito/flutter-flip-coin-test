@@ -12,19 +12,23 @@ void main() => runApp(
 
 class Counter with ChangeNotifier {
   int value = 0;
-  var fpc = FlipCardController();
+  var fpc = FlipCardController(); // Create a FlipCardController instance
+
+  // Add a getter to expose the FlipCardController instance
+  FlipCardController get flipCardController => fpc;
 
   void increment() {
-    print('increment');
     value += 1;
-    print('Value is now: ${value}');
-
-    // if (value == 3) {
-    //   print('Value is 3 toogle card');
-    //   fpc.toggleCard();
-    // }
+    print('Value is now: $value');
 
     notifyListeners();
+  }
+
+  void checkToogledAmount() {
+    if (value == 3) {
+      print('Value is 3 - toogle card');
+      fpc.toggleCard(); // Use the FlipCardController instance to toggle the card
+    }
   }
 }
 
@@ -36,18 +40,10 @@ class AppWidget extends StatefulWidget {
 }
 
 class _AppWidgetState extends State<AppWidget> {
-  late FlipCardController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = FlipCardController();
-  }
-
   @override
   Widget build(BuildContext context) {
-     var counter = context.read<Counter>();
-     
+    var counter = context.read<Counter>(); // Read the Counter instance
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Material App',
@@ -58,7 +54,8 @@ class _AppWidgetState extends State<AppWidget> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               FlipCard(
-                controller: _controller,
+                // Use the FlipCardController instance from the Counter instance
+                controller: counter.flipCardController,
                 back: const Image(
                   image: AssetImage('assets/images/coin-back.png'),
                   width: 200,
@@ -69,8 +66,16 @@ class _AppWidgetState extends State<AppWidget> {
                 ),
                 onFlip: () {
                   print('Flipped');
-
-                  counter.increment();
+                  counter.increment(); // Increment the counter
+                  // counter.flipCardController.toggleCard(); // Toggle the card
+                  counter.checkToogledAmount();
+                  // if (counter.value == 3) {
+                  //   counter.flipCardController.toggleCard();
+                  // }
+                },
+                onFlipDone: (status) {
+                  print('status: ${status}');
+                  counter.checkToogledAmount();
                 },
               ),
               const SizedBox(
@@ -78,12 +83,14 @@ class _AppWidgetState extends State<AppWidget> {
               ),
               const Text('You have clicked...'),
               Consumer<Counter>(
-                  builder: (context, counter, child) =>
-                      Text('Clicked: ${counter.value}'),),
+                builder: (context, counter, child) =>
+                    Text('Clicked: ${counter.value}'),
+              ),
               IconButton(
                 onPressed: () {
-                  if (!_controller.state!.isFront) {
-                    _controller.toggleCard();
+                  // Toggle the card if it's not front
+                  if (!counter.flipCardController.state!.isFront) {
+                    counter.flipCardController.toggleCard();
                   }
                 },
                 icon: const Icon(Icons.threesixty_rounded),
